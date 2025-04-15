@@ -119,6 +119,26 @@
         .btn-discreet:hover {
             background-color: #e9ecef;
         }
+        /* Estilos para a consulta de perímetro */
+        .perimetro-consulta {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .perimetro-consulta h5 {
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+        .resultado-corte {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -166,6 +186,24 @@
                             <button type="submit" class="btn btn-primary btn-custom w-100">Salvar</button>
                         </div>
                     </form>
+
+                    <!-- Consulta de Perímetro -->
+                    <div class="perimetro-consulta">
+                        <h5>Consulta de Perímetro</h5>
+                        <div class="row g-3">
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="consultaPerimetro" placeholder="Digite o perímetro para consulta">
+                            </div>
+                            <div class="col-4">
+                                <button id="buscarCorte" class="btn btn-primary w-100">Buscar</button>
+                            </div>
+                            <div class="col-12">
+                                <div id="resultadoConsulta" class="resultado-corte" style="display: none;">
+                                    <p>Corte relacionado: <span id="corteRelacionado"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div id="successMessage" class="alert alert-success mt-3" role="alert">
                         Dados salvos com sucesso!
@@ -511,6 +549,38 @@
             }
 
             reader.readAsText(file);
+        });
+
+        // Função para buscar corte por perímetro
+        $('#buscarCorte').on('click', function() {
+            const perimetroConsulta = parseFloat($('#consultaPerimetro').val().replace(',', '.'));
+            let corteEncontrado = null;
+            let produtoEncontrado = null;
+
+            // Procura em todos os produtos cadastrados
+            for (const produto in products) {
+                if (products[produto].perimetro && parseFloat(products[produto].perimetro) === perimetroConsulta) {
+                    corteEncontrado = products[produto].corte;
+                    produtoEncontrado = produto;
+                    break;
+                }
+            }
+
+            if (corteEncontrado !== null) {
+                $('#corteRelacionado').text(`${corteEncontrado} (Produto: ${produtoEncontrado})`);
+                $('#resultadoConsulta').show();
+            } else {
+                $('#corteRelacionado').text('Nenhum corte encontrado para este perímetro');
+                $('#resultadoConsulta').show();
+            }
+        });
+
+        // Permite pressionar Enter para buscar
+        $('#consultaPerimetro').on('keypress', function(e) {
+            if (e.which === 13) {
+                $('#buscarCorte').click();
+                e.preventDefault();
+            }
         });
 
         loadFromLocalStorage();
