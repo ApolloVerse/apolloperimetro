@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APOLLO - Lino</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('https://images.pexels.com/photos/957024/forest-trees-perspective-bright-957024.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            opacity: 1.1;
+        }
+        .form-container, .history-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 1.5rem;
+        }
+        .form-container h2, .history-container h3 {
+            color: #007bff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-size: 1.5rem;
+        }
+        .form-container input, .form-container select, .form-container button {
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+        .form-container button {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        #productDetails {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+        }
+        #successMessage {
+            display: none;
+            font-size: 0.9rem;
+        }
+        #productSelect {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .delete-comment {
+            cursor: pointer;
+            color: red;
+            margin-left: 10px;
+            font-size: 0.8rem;
+        }
+        .delete-comment:hover {
+            color: darkred;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .history-item {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 0.85rem;
+        }
+        .history-item h4 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .history-item p {
+            margin: 0.25rem 0;
+            font-size: 0.8rem;
+        }
+        .history-item small {
+            color: #666;
+            font-size: 0.75rem;
+        }
+        /* Estilos personalizados para os botões */
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            margin: 0.1rem;
+        }
+        .btn-discreet {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-discreet:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <!-- Coluna Esquerda: Formulário -->
+            <div class="col-12 col-lg-6">
+                <div class="form-container">
+                    <h2 id="formulário-de-produto" class="text-center mb-4">LINO - APOLLO 2025</h2>
+                    
+                    <form id="productForm" class="mb-4">
+                        <div class="row g-3">
+                            <!-- Produto -->
+                            <div class="col-12">
+                                <input type="text" class="form-control" id="produto" placeholder="Produto" required>
+                            </div>
+                            
+                            <!-- Repetição, Corte, Perímetro, Velocidade e Chagrim -->
+                            <div class="col-6 col-md-2">
+                                <input type="number" class="form-control" id="repeticao" placeholder="Repetição" required maxlength="4">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <input type="text" class="form-control" id="corte" placeholder="Corte" step="any">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <input type="text" class="form-control" id="perimetro" placeholder="Perímetro">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="text" class="form-control" id="velocidade" placeholder="Velocidade">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <select class="form-select" id="chagrim">
+                                    <option value="">Chagrim</option>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Observações -->
+                            <div class="col-12">
+                                <input type="text" class="form-control" id="observacoes" placeholder="Observações">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary btn-custom w-100">Salvar</button>
+                        </div>
+                    </form>
+
+                    <div id="successMessage" class="alert alert-success mt-3" role="alert">
+                        Dados salvos com sucesso!
+                    </div>
+
+                    <div class="mt-4">
+                        <h3>Histórico de Produtos</h3>
+                        <select id="productSelect" class="form-select mb-3">
+                            <option value="">Selecione um produto</option>
+                        </select>
+                    </div>
+
+                    <div id="productDetails" class="mt-3" style="display: none;"></div>
+
+                    <!-- Botões de Deletar, Importar e Exportar em uma única linha -->
+                    <div class="d-flex justify-content-between mt-3">
+                        <button id="deleteProduct" class="btn btn-danger btn-small" style="display: none;">Deletar</button>
+                        <button id="exportData" class="btn btn-success btn-small btn-discreet">Exportar</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <button id="importData" class="btn btn-primary btn-small btn-discreet">Importar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Histórico dos Últimos 10 Produtos -->
+            <div class="col-12 col-lg-6">
+                <div class="history-container">
+                    <h3 class="text-center mb-4">Últimos 10 Produtos</h3>
+                    <div id="historyList" class="history-list">
+                        <!-- Histórico será preenchido dinamicamente aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let products = {};
+        let history = [];
+
+        function loadFromLocalStorage() {
+            const savedProducts = localStorage.getItem('products');
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+                updateProductSelect();
+            }
+
+            const savedHistory = localStorage.getItem('history');
+            if (savedHistory) {
+                history = JSON.parse(savedHistory);
+                updateHistory();
+            }
+
+            const backgroundImage = localStorage.getItem('backgroundImage');
+            if (backgroundImage) {
+                document.body.style.backgroundImage = `url(${backgroundImage})`;
+            }
+
+            // Verifica se é necessário fazer o download mensal
+            checkMonthlyDownload();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        function parseDecimalInput(value) {
+            return parseFloat(value.replace(',', '.'));
+        }
+
+        function checkMonthlyDownload() {
+            const lastDownload = localStorage.getItem('lastDownload');
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            if (lastDownload) {
+                const lastDownloadDate = new Date(lastDownload);
+                const lastDownloadMonth = lastDownloadDate.getMonth();
+                const lastDownloadYear = lastDownloadDate.getFullYear();
+
+                // Verifica se já se passou um mês desde o último download
+                if (currentYear > lastDownloadYear || (currentYear === lastDownloadYear && currentMonth > lastDownloadMonth)) {
+                    showDownloadConfirmation();
+                }
+            } else {
+                // Se nunca foi feito um download, faz o primeiro
+                showDownloadConfirmation();
+            }
+        }
+
+        function showDownloadConfirmation() {
+            if (confirm('Já se passou um mês desde o último download. Deseja fazer o download dos dados agora?')) {
+                downloadData();
+            }
+        }
+
+        function downloadData() {
+            const dataStr = JSON.stringify(products, null, 2); // Formata o JSON com indentação
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dados_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // Atualiza a data do último download
+            localStorage.setItem('lastDownload', new Date().toISOString());
+        }
+
+        $('#productForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const produto = $('#produto').val().toUpperCase();
+            const repeticao = $('#repeticao').val();
+            const chagrim = $('#chagrim').val();
+            const corte = parseDecimalInput($('#corte').val());
+            const velocidade = $('#velocidade').val();
+            const perimetro = parseDecimalInput($('#perimetro').val());
+            const observacoes = $('#observacoes').val();
+            const timestamp = new Date().toLocaleString(); // Data e hora atual
+
+            const productData = {
+                produto,
+                repeticao,
+                chagrim,
+                corte,
+                velocidade,
+                perimetro,
+                observacoes,
+                timestamp
+            };
+
+            // Verifica se o produto já existe no histórico
+            const existingIndex = history.findIndex(item => item.produto === produto);
+            if (existingIndex !== -1) {
+                // Remove o produto existente do histórico
+                history.splice(existingIndex, 1);
+            }
+
+            // Adiciona o produto atualizado no topo do histórico
+            history.unshift(productData);
+
+            // Mantém apenas os 10 últimos produtos no histórico
+            if (history.length > 10) {
+                history.pop();
+            }
+
+            // Atualiza o produto no objeto products
+            if (!products[produto]) {
+                products[produto] = {
+                    repeticao: repeticao,
+                    chagrim: chagrim,
+                    corte: corte,
+                    velocidade: velocidade,
+                    perimetro: perimetro,
+                    observacoes: [observacoes],
+                    timestamp: timestamp
+                };
+            } else {
+                products[produto].repeticao = repeticao;
+                products[produto].chagrim = chagrim;
+                products[produto].corte = corte;
+                products[produto].velocidade = velocidade;
+                products[produto].perimetro = perimetro;
+                if (observacoes) {
+                    products[produto].observacoes.unshift(observacoes);
+                }
+                products[produto].timestamp = timestamp;
+            }
+
+            updateProductSelect();
+            updateHistory();
+            saveToLocalStorage();
+            showSuccessMessage();
+            this.reset();
+        });
+
+        function updateProductSelect() {
+            const select = $('#productSelect');
+            select.html('<option value="">Selecione um produto</option>');
+            
+            const sortedProducts = Object.keys(products).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+            
+            for (let produto of sortedProducts) {
+                select.append(`<option value="${produto}">${produto}</option>`);
+            }
+        }
+
+        function updateHistory() {
+            const historyList = $('#historyList');
+            historyList.html('');
+            history.forEach((item) => {
+                historyList.append(`
+                    <div class="history-item">
+                        <h4>${item.produto}</h4>
+                        <p><strong>Repetição:</strong> ${item.repeticao}</p>
+                        <p><strong>Chagrim:</strong> ${item.chagrim}</p>
+                        <p><strong>Corte:</strong> ${item.corte}</p>
+                        <p><strong>Velocidade:</strong> ${item.velocidade}</p>
+                        <p><strong>Perímetro:</strong> ${item.perimetro}</p>
+                        <p><strong>Observações:</strong> ${item.observacoes}</p>
+                        <p><small>Inserido em: ${item.timestamp}</small></p>
+                    </div>
+                `);
+            });
+        }
+
+        function showSuccessMessage() {
+            $('#successMessage').show().delay(3000).fadeOut();
+        }
+
+        $('#productSelect').on('change', function() {
+            const productDetails = $('#productDetails');
+            const deleteButton = $('#deleteProduct');
+            
+            if (this.value) {
+                const product = products[this.value];
+                let observacoesHtml = product.observacoes.map((obs, index) => 
+                    `<p>${index + 1}. ${obs} <span class="delete-comment" data-index="${index}">❌</span></p>`
+                ).join('');
+                productDetails.html(`
+                    <h4>${this.value}</h4>
+                    <p><strong>Repetição:</strong> ${product.repeticao}</p>
+                    <p><strong>Chagrim:</strong> ${product.chagrim}</p>
+                    <p><strong>Corte:</strong> ${product.corte}</p>
+                    <p><strong>Velocidade:</strong> ${product.velocidade}</p>
+                    <p><strong>Perímetro:</strong> ${product.perimetro}</p>
+                    <h5>Observações:</h5>
+                    ${observacoesHtml}
+                    <p><small>Última atualização: ${product.timestamp}</small></p>
+                `);
+                productDetails.show();
+                deleteButton.show();
+
+                $('#produto').val(this.value);
+                $('#repeticao').val(product.repeticao);
+                $('#chagrim').val(product.chagrim);
+                $('#corte').val(product.corte);
+                $('#velocidade').val(product.velocidade);
+                $('#perimetro').val(product.perimetro);
+                $('#observacoes').val('');
+            } else {
+                productDetails.html('');
+                productDetails.hide();
+                deleteButton.hide();
+            }
+        });
+
+        $('#deleteProduct').on('click', function() {
+            const select = $('#productSelect');
+            if (select.val()) {
+                delete products[select.val()];
+                updateProductSelect();
+                $('#productDetails').html('');
+                $('#productDetails').hide();
+                $(this).hide();
+                $('#productForm')[0].reset();
+                saveToLocalStorage();
+            }
+        });
+
+        $(document).on('click', '.delete-comment', function() {
+            const index = $(this).data('index');
+            const produto = $('#productSelect').val();
+            products[produto].observacoes.splice(index, 1);
+            $('#productSelect').trigger('change');
+            saveToLocalStorage();
+        });
+
+        $('#produto').autocomplete({
+            source: function(request, response) {
+                var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(request.term), "i");
+                response($.grep(Object.keys(products), function(item) {
+                    return matcher.test(item);
+                }));
+            },
+            select: function(event, ui) {
+                $('#productSelect').val(ui.item.value).trigger('change');
+            }
+        });
+
+        $('#produto').on('input', function() {
+            $(this).val($(this).val().toUpperCase());
+        });
+
+        $('#repeticao').on('input', function() {
+            if ($(this).val().length > 4) {
+                $(this).val($(this).val().slice(0, 4));
+            }
+        });
+
+        $('#corte, #perimetro').on('input', function() {
+            $(this).val($(this).val().replace(/[^0-9,.-]/g, ''));
+        });
+
+        $('#backgroundImage').on('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const img = event.target.result;
+                document.body.style.backgroundImage = `url(${img})`;
+                localStorage.setItem('backgroundImage', img);
+            }
+
+            reader.readAsDataURL(file);
+        });
+
+        $('#exportData').on('click', function() {
+            const dataStr = JSON.stringify(products, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'products.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        $('#importData').on('click', function() {
+            $('#importFile').click();
+        });
+
+        $('#importFile').on('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                try {
+                    products = JSON.parse(event.target.result);
+                    updateProductSelect();
+                    saveToLocalStorage();
+                    alert('Dados importados com sucesso!');
+                } catch (error) {
+                    alert('Erro ao importar dados. Verifique o formato do arquivo.');
+                }
+            }
+
+            reader.readAsText(file);
+        });
+
+        loadFromLocalStorage();
+    </script>
+</body>
+</html>
